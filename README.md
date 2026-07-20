@@ -71,7 +71,7 @@ This workflow helps businesses:
 
 ### Confirmation Email
 
-![Email](screenshots/email.png)
+![Email](screenshots/gmail.png)
 
 ### Slack Notification
 
