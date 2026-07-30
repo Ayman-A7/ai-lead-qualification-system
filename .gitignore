@@ -1,0 +1,12 @@
+ai-lead-qualification-system/
+│
+├── .gitignore
+├── LICENSE
+├── README.md
+├── workflow.json
+│
+├── assets/
+│   ├── workflow.png
+│   ├── airtable-leads.png
+│   ├── automation-logs.png
+│   └── slack-alert.png
