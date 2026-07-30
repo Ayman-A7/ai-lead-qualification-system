@@ -245,14 +245,7 @@ The workflow includes production-inspired reliability features:
 
 # 🎥 Demo
 
-Add a 60–90 second demo video showing:
-
-- Receiving a webhook
-- AI qualification
-- Airtable record creation
-- Slack notification
-- Follow-up task creation
-- Final webhook response
+Adding Soon!
 
 ---
 
