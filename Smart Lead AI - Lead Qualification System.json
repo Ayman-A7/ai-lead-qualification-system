@@ -1,0 +1,2409 @@
+{
+  "name": "Smart Lead AI - Lead Qualification System",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fbb15526-4cce-41ca-9928-aaedab9e3256",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7bcd4c56-3615-46c1-b1bd-1776532c0bf7",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "0a17d5e1-68d6-475b-9e84-f525c3a0250b",
+              "leftValue": "={{ $json.body.phone }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -672,
+        16
+      ],
+      "id": "b549991f-f757-40b5-ac51-49b3292305a6",
+      "name": "02 - Validate Required Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -896,
+        16
+      ],
+      "id": "8cea4335-bb11-46aa-bc42-f676969e378b",
+      "name": "01 - Receive New Lead",
+      "webhookId": "c7d42e6c-238d-47b0-845a-f52fc21fed2c"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "22d1bd67-aa1d-47fb-b350-fee6c63b8ca2",
+              "name": "Name",
+              "value": "={{ $json.body.name.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "5fd19b5b-bb46-42dd-bdc8-516897b9cfff",
+              "name": "Email",
+              "value": "={{ $json.body.email.toLowerCase().trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "8dea3d8e-6d45-4f09-b3e0-8d5cece67ef6",
+              "name": "Phone",
+              "value": "={{ $json.body.phone.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "fdb52d23-7dd3-43e3-9364-6983b43c4842",
+              "name": "Company",
+              "value": "={{ $json.body.company.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "11562409-c492-4bbb-acc8-9be301065391",
+              "name": "Message",
+              "value": "={{ $json.body.message.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "68052074-cacc-4508-bc3b-39feede36169",
+              "name": "Source",
+              "value": "={{ $json.body.source || \"Website\"}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -448,
+        -80
+      ],
+      "id": "187dd7de-3274-4ed0-94bd-3bc88cbc5beb",
+      "name": "03 - Clean Lead Data"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "applu4tpM2R7wI7Cy",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblPPIibjx5G7eu4l",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy/tblPPIibjx5G7eu4l"
+        },
+        "filterByFormula": "={Email} = '{{ $json.Email.trim() }}'",
+        "returnAll": false,
+        "limit": 1,
+        "options": {},
+        "sort": {
+          "property": []
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        -80
+      ],
+      "id": "7df92921-993c-4753-a4ad-467a52cba0fc",
+      "name": "04 - Check Duplicate Lead",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "HTKgdkMecNpgMRig",
+          "name": "Airtable account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "applu4tpM2R7wI7Cy",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblPPIibjx5G7eu4l",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy/tblPPIibjx5G7eu4l"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "Lead Name": "={{ $('03 - Clean Lead Data').item.json.Name }}",
+            "Company": "={{ $('03 - Clean Lead Data').item.json.Company }}",
+            "Email": "={{ $('03 - Clean Lead Data').item.json.Email }}",
+            "Phone": "={{ $('03 - Clean Lead Data').item.json.Phone }}",
+            "Message": "={{ $('03 - Clean Lead Data').item.json.Message }}",
+            "Source": "={{ $('03 - Clean Lead Data').item.json.Source }}",
+            "LeadScore": "={{ $json.fields.LeadScore }}",
+            "Priority": "={{ $json.fields.Priority }}",
+            "Lead ID": "={{ $json.fields['Lead ID'] }}",
+            "Status": "={{ $json.fields.Status }}",
+            "AssignedTeam": "={{ $json.fields.AssignedTeam }}",
+            "Action": "={{ $json.fields.Action }}",
+            "Recommended Action": "={{ $json.fields['Recommended Action'] }}",
+            "Processed At": "={{ $json.fields['Processed At'] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead Name",
+              "displayName": "Lead Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "LeadScore",
+              "displayName": "LeadScore",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AssignedTeam",
+              "displayName": "AssignedTeam",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Action",
+              "displayName": "Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reasoning",
+              "displayName": "Reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Recommended Action",
+              "displayName": "Recommended Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Processed At",
+              "displayName": "Processed At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        -224
+      ],
+      "id": "13fb4291-cfac-4d45-a21a-243d688d64b6",
+      "name": "06 - Update Existing Lead",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "HTKgdkMecNpgMRig",
+          "name": "Airtable account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9a966797-cbf7-40b5-ad03-e8735cbe91ee",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        -80
+      ],
+      "id": "41e79db2-27ec-4d15-8561-2bacf91a4165",
+      "name": "05 - Check Duplicate Lead"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Lead already exists. Record updated.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        512,
+        -224
+      ],
+      "id": "dfdad4b7-0f6e-4ea8-9d26-073ed820df23",
+      "name": "07 - Duplicate Response"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert sales qualification assistant.\n\nAnalyze this incoming lead and determine its quality.\n\nLead Information:\n\nName: {{ $('03 - Clean Lead Data').item.json.Name }}\n\nEmail: {{ $('03 - Clean Lead Data').item.json.Email }}\n\nCompany: {{ $('03 - Clean Lead Data').item.json.Company }}\n\nMessage: {{ $('03 - Clean Lead Data').item.json.Message }}\n\nSource: {{ $('03 - Clean Lead Data').item.json.Source }}\n\nEvaluate:\n1. Buying intent\n2. Company potential\n3. Urgency\n4. Fit for our service\n\nReturn ONLY valid JSON:\n\n{\n  \"score\": number,\n  \"priority\": \"High | Medium | Low\",\n  \"reasoning\": \"short explanation\",\n  \"recommended_action\": \"next sales step\"\n}",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        448,
+        112
+      ],
+      "id": "8ff0e895-5eec-4c3a-b334-cc5350285e2a",
+      "name": "07 - AI Lead Qualification",
+      "retryOnFail": true,
+      "executeOnce": false,
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json.text || $json.output || $json.response;\n\nif (!response) {\n  throw new Error(\"No AI response received.\");\n}\n\nconst cleanJson = response\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\ntry {\n  const aiData = JSON.parse(cleanJson);\n\n  return {\n    json: {\n      ...$node[\"06 - Generate Lead ID\"].json,\n      aiScore: aiData.score,\n      priority: aiData.priority,\n      reasoning: aiData.reasoning,\n      recommendedAction: aiData.recommended_action\n    }\n  };\n} catch (error) {\n  throw new Error(\"Invalid JSON returned by AI.\");\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        16
+      ],
+      "id": "016e3727-4380-49bb-8c53-4410b38aed63",
+      "name": "08 - Parse AI Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const date = new Date();\n\nconst leadId = \n  \"LEAD-\" +\n  date.getFullYear() +\n  String(date.getMonth() + 1).padStart(2, \"0\") +\n  String(date.getDate()).padStart(2, \"0\") +\n  \"-\" +\n  Math.floor(Math.random() * 9000 + 1000);\n\nreturn {\n  json: {\n    ...$json,\n    leadId\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        112
+      ],
+      "id": "b2cf4f0a-5edc-4f37-a999-9a83ac921245",
+      "name": "06 - Generate Lead ID"
+    },
+    {
+      "parameters": {
+        "jsCode": "let status = \"Nurture\";\nlet action = \"Store Lead\";\nlet assignedTeam = \"Marketing\";\n\nswitch ($json.priority) {\n  case \"High\":\n    status = \"Sales Contact Required\";\n    action = \"Notify Sales via Slack\";\n    assignedTeam = \"Sales\";\n    break;\n\n  case \"Medium\":\n    status = \"Follow Up Required\";\n    action = \"Create Follow-up Task\";\n    assignedTeam = \"Customer Success\";\n    break;\n\n  case \"Low\":\n    status = \"Nurture\";\n    action = \"Store Lead Only\";\n    assignedTeam = \"Marketing\";\n    break;\n\n  default:\n    status = \"Review Required\";\n    action = \"Manual Review\";\n    assignedTeam = \"Operations\";\n}\n\nreturn {\n  json: {\n    ...$json,\n    status,\n    action,\n    assignedTeam,\n    processedAt: new Date().toISOString()\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        16
+      ],
+      "id": "97d8590d-eeab-4ff1-b486-c6403976f2e8",
+      "name": "09 - Enrich Lead Data"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "applu4tpM2R7wI7Cy",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblPPIibjx5G7eu4l",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy/tblPPIibjx5G7eu4l"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Lead Name": "={{ $('03 - Clean Lead Data').item.json.Name }}",
+            "Email": "={{ $('03 - Clean Lead Data').item.json.Email }}",
+            "Company": "={{ $('03 - Clean Lead Data').item.json.Company }}",
+            "Phone": "={{ $('03 - Clean Lead Data').item.json.Phone }}",
+            "Message": "={{ $('03 - Clean Lead Data').item.json.Message }}",
+            "Source": "={{ $('03 - Clean Lead Data').item.json.Source }}",
+            "LeadScore": "={{ $json.aiScore }}",
+            "Priority": "={{ $json.priority }}",
+            "Lead ID": "={{ $json.leadId }}",
+            "Recommended Action": "={{ $json.recommendedAction }}",
+            "Status": "={{ $json.status }}",
+            "Action": "={{ $json.action }}",
+            "Processed At": "={{ $json.processedAt }}",
+            "AssignedTeam": "={{ $json.assignedTeam }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead Name",
+              "displayName": "Lead Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "LeadScore",
+              "displayName": "LeadScore",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Recommended Action",
+              "displayName": "Recommended Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Processed At",
+              "displayName": "Processed At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Action",
+              "displayName": "Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AssignedTeam",
+              "displayName": "AssignedTeam",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        16
+      ],
+      "id": "f96fa68b-cfef-4b48-9cff-5347b63fbf69",
+      "name": "10 - Save Lead",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "HTKgdkMecNpgMRig",
+          "name": "Airtable account 3"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.fields.Priority }}",
+                    "rightValue": "High",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c95f656b-2e60-4720-8f44-6ea079ba55bc"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "80cefd56-310a-4314-a97f-cfb0bbbe505e",
+                    "leftValue": "={{ $json.fields.Priority }}",
+                    "rightValue": "Medium",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "dbc697f0-996a-4824-b4dc-b1abf80ca2c0",
+                    "leftValue": "={{ $json.fields.Priority }}",
+                    "rightValue": "Low",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1920,
+        -144
+      ],
+      "id": "3338289b-808e-46a1-8cd6-5ae2d1e0b7e0",
+      "name": "11 - Route by Priority"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "applu4tpM2R7wI7Cy",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblGAVQ0xEyl1gb4V",
+          "mode": "list",
+          "cachedResultName": "Automation Logs",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy/tblGAVQ0xEyl1gb4V"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Execution ID": "={{ $execution.id }}",
+            "Workflow": "AI Lead Qualification",
+            "Lead ID": "={{ $('06 - Generate Lead ID').item.json.leadId }}",
+            "Step": "Gemini",
+            "Result": "FAILED",
+            "Error Message": "No response  from AI",
+            "Timestamp": "={{$now}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Execution ID",
+              "displayName": "Execution ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Result",
+              "displayName": "Result",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        208
+      ],
+      "id": "8d6001ef-c11e-4f7a-8baf-542f492d204e",
+      "name": "99 - Log Error",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "HTKgdkMecNpgMRig",
+          "name": "Airtable account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"message\": \"Workflow execution failed\",\n  \"executionId\": \"{{$execution.id}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1248,
+        208
+      ],
+      "id": "9189c556-1813-490f-824c-108bd4efce31",
+      "name": " 100 - Error Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "171b4afc-d4b1-49b1-9c3d-4d517d747323",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        800,
+        112
+      ],
+      "id": "ffc74238-1994-46e6-8069-3be3da2be132",
+      "name": "08- AI Response Received?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f827133e-a694-448b-9507-efd401e7ff6c",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1696,
+        16
+      ],
+      "id": "fca057d5-4ab6-41c8-858a-10202091ad4e",
+      "name": "10A - Lead Saved?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d8471e5b-0b42-47dd-9acc-ea8d3dca8088",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2368,
+        -464
+      ],
+      "id": "835a3401-0a7e-4eb1-9618-4fb9d0d65dd3",
+      "name": "Check Slack API"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BJC2TTW9Y",
+          "mode": "list",
+          "cachedResultName": "all-aymanamjad7"
+        },
+        "text": "=🔥 High Priority Lead Detected \nLead ID: {{$json.leadId}}\nName: {{ $('03 - Clean Lead Data').item.json.Name }}\nCompany: {{ $('03 - Clean Lead Data').item.json.Email }}\nAI Score: {{$json.aiScore}} \nReason: {{$json.reasoning}} \nRecommended Action: {{$json.recommendedAction}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        2144,
+        -464
+      ],
+      "id": "91dcf488-e91a-4d5a-8c96-b975e0f26ec7",
+      "name": "11A - Notify Sales Team",
+      "webhookId": "816ca43e-cc41-4049-acbf-f9f6d5ea8e42",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "s8CVofIRhaIH2p2D",
+          "name": "Slack account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "applu4tpM2R7wI7Cy",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblHFQr7icVTEtq2m",
+          "mode": "list",
+          "cachedResultName": "Follow Up Tasks",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy/tblHFQr7icVTEtq2m"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Lead ID": "={{ $json.fields['Lead ID'] }}",
+            "Lead Name": "={{ $json.fields['Lead Name'] }}",
+            "Email": "={{ $json.fields.Email }}",
+            "Priority": "Medium",
+            "Status": "={{ $json.fields.Status }}",
+            "Assigned Team": "={{ $json.fields.AssignedTeam }}",
+            "Action": "={{ $json.fields.Action }}",
+            "Due Date": "2026-07-30T00:00:00"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead Name",
+              "displayName": "Lead Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "High",
+                  "value": "High"
+                },
+                {
+                  "name": "Medium",
+                  "value": "Medium"
+                },
+                {
+                  "name": "Low",
+                  "value": "Low"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Assigned Team",
+              "displayName": "Assigned Team",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Action",
+              "displayName": "Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2144,
+        -176
+      ],
+      "id": "8f84d531-ba61-465c-9043-f2159a6c3f2b",
+      "name": "11B - Create Follow Up Task",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "HTKgdkMecNpgMRig",
+          "name": "Airtable account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "applu4tpM2R7wI7Cy",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblGAVQ0xEyl1gb4V",
+          "mode": "list",
+          "cachedResultName": "Automation Logs",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy/tblGAVQ0xEyl1gb4V"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Execution ID": "={{ $execution.id }}",
+            "Workflow": "AI Lead Qualification",
+            "Lead ID": "={{ $json.fields['Lead ID'] }}",
+            "Timestamp": "={{$now}}",
+            "Result": "SUCCESS"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Execution ID",
+              "displayName": "Execution ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Result",
+              "displayName": "Result",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2144,
+        16
+      ],
+      "id": "a9adc87b-2e88-4639-8e0e-03bf9345258e",
+      "name": "11C - Log Successful Execution2",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "HTKgdkMecNpgMRig",
+          "name": "Airtable account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "applu4tpM2R7wI7Cy",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblGAVQ0xEyl1gb4V",
+          "mode": "list",
+          "cachedResultName": "Automation Logs",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy/tblGAVQ0xEyl1gb4V"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Execution ID": "={{ $execution.id }}",
+            "Workflow": "AI Lead Qualification",
+            "Lead ID": "={{ $('10A - Lead Saved?').item.json.fields['Lead ID'] }}",
+            "Timestamp": "={{$now}}",
+            "Priority": "={{ $('10A - Lead Saved?').item.json.fields.Priority }}",
+            "Result": "success"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Execution ID",
+              "displayName": "Execution ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Result",
+              "displayName": "Result",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2592,
+        -560
+      ],
+      "id": "5ccb806b-8374-4dcc-848a-1a4d47cbea72",
+      "name": "12A - Log Successful Execution",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "HTKgdkMecNpgMRig",
+          "name": "Airtable account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "applu4tpM2R7wI7Cy",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblGAVQ0xEyl1gb4V",
+          "mode": "list",
+          "cachedResultName": "Automation Logs",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy/tblGAVQ0xEyl1gb4V"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Execution ID": "={{ $execution.id }}",
+            "Workflow": "AI Lead Qualification",
+            "Lead ID": "={{ $json.fields['Lead ID'] }}",
+            "Timestamp": "={{$now}}",
+            "Result": "SUCCESS"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Execution ID",
+              "displayName": "Execution ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Result",
+              "displayName": "Result",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2368,
+        -176
+      ],
+      "id": "e79cad5f-d449-4e99-8b74-2c840bb1c496",
+      "name": "12B - Log Successful Execution1",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "HTKgdkMecNpgMRig",
+          "name": "Airtable account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"leadId\": \"{{ $json.fields['Lead ID'] }}\",\n  \"priority\": \"{{ $json.fields.Priority }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2816,
+        -560
+      ],
+      "id": "2b347d80-abed-4b9b-8d50-522507b4bfce",
+      "name": "13A - Succeess Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"leadId\": \"{{ $json.fields['Lead ID'] }}\",\n  \"priority\": \"{{ $json.fields.Priority }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2592,
+        -176
+      ],
+      "id": "6e0aaacd-7686-42dc-b9da-e8c54e0b48b5",
+      "name": "13B - Succeess Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"leadId\": \"{{ $json.fields['Lead ID'] }}\",\n  \"priority\": \"{{ $json.fields.Priority }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2368,
+        16
+      ],
+      "id": "51536fa6-2276-4865-96bb-ff24a5aa582a",
+      "name": "13C - Succeess Response"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        336
+      ],
+      "id": "790b8846-f7e8-4ca8-8e87-bb78486800a6",
+      "name": "Gemini AI Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WrbY98auAVWVuuZ6",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -448,
+        128
+      ],
+      "id": "70e346df-2ad0-4a8a-94f8-0c7f434d5f1a",
+      "name": "99 - Validate Response Error"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "applu4tpM2R7wI7Cy",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblGAVQ0xEyl1gb4V",
+          "mode": "list",
+          "cachedResultName": "Automation Logs",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy/tblGAVQ0xEyl1gb4V"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Lead ID": "={{ $('10 - Save Lead').item.json.fields['Lead ID'] }}",
+            "Execution ID": "={{$execution.id}}",
+            "Workflow": "AI Lead Qualification",
+            "Step": "Save Lead",
+            "Result": "FAILED",
+            "Error Message": "Failed to  Create Airtable Record",
+            "Timestamp": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Execution ID",
+              "displayName": "Execution ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Result",
+              "displayName": "Result",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1920,
+        208
+      ],
+      "id": "ce7b796f-dba8-4fd9-8878-fffaff04d401",
+      "name": "99 - Log Error1",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "HTKgdkMecNpgMRig",
+          "name": "Airtable account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "applu4tpM2R7wI7Cy",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblGAVQ0xEyl1gb4V",
+          "mode": "list",
+          "cachedResultName": "Automation Logs",
+          "cachedResultUrl": "https://airtable.com/applu4tpM2R7wI7Cy/tblGAVQ0xEyl1gb4V"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Execution ID": "={{$execution.id}}",
+            "Lead ID": "={{ $('11 - Route by Priority').item.json.fields['Lead ID'] }}",
+            "Workflow": "AI Lead Qualification",
+            "Step": "Slack Notification",
+            "Result": "FAILED",
+            "Error Message": "Slack  API Unavailable",
+            "Timestamp": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Execution ID",
+              "displayName": "Execution ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead ID",
+              "displayName": "Lead ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Result",
+              "displayName": "Result",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2592,
+        -368
+      ],
+      "id": "78f70809-53af-4a7a-9a02-342f408e10bd",
+      "name": "99 - Log Error2",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "HTKgdkMecNpgMRig",
+          "name": "Airtable account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"message\": \"Workflow execution failed\",\n  \"executionId\": \"{{$execution.id}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2816,
+        -368
+      ],
+      "id": "a23e0e07-38c5-4086-8236-113c81fc6a0e",
+      "name": "100 - Error Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"message\": \"Workflow execution failed\",\n  \"executionId\": \"{{$execution.id}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2144,
+        208
+      ],
+      "id": "d541c9ed-d995-4e9d-a400-e50f5947651b",
+      "name": "100- Error Response1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "01 - Receive New Lead": {
+      "main": [
+        [
+          {
+            "node": "02 - Validate Required Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02 - Validate Required Fields": {
+      "main": [
+        [
+          {
+            "node": "03 - Clean Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "99 - Validate Response Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Clean Lead Data": {
+      "main": [
+        [
+          {
+            "node": "04 - Check Duplicate Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Check Duplicate Lead": {
+      "main": [
+        [
+          {
+            "node": "05 - Check Duplicate Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05 - Check Duplicate Lead": {
+      "main": [
+        [
+          {
+            "node": "06 - Update Existing Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "06 - Generate Lead ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06 - Update Existing Lead": {
+      "main": [
+        [
+          {
+            "node": "07 - Duplicate Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "07 - AI Lead Qualification": {
+      "main": [
+        [
+          {
+            "node": "08- AI Response Received?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06 - Generate Lead ID": {
+      "main": [
+        [
+          {
+            "node": "07 - AI Lead Qualification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "08 - Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "09 - Enrich Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "09 - Enrich Lead Data": {
+      "main": [
+        [
+          {
+            "node": "10 - Save Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10 - Save Lead": {
+      "main": [
+        [
+          {
+            "node": "10A - Lead Saved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11 - Route by Priority": {
+      "main": [
+        [
+          {
+            "node": "11A - Notify Sales Team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "11B - Create Follow Up Task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "11C - Log Successful Execution2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "99 - Log Error": {
+      "main": [
+        [
+          {
+            "node": " 100 - Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "08- AI Response Received?": {
+      "main": [
+        [
+          {
+            "node": "08 - Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "99 - Log Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10A - Lead Saved?": {
+      "main": [
+        [
+          {
+            "node": "11 - Route by Priority",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "99 - Log Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Slack API": {
+      "main": [
+        [
+          {
+            "node": "12A - Log Successful Execution",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "99 - Log Error2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11A - Notify Sales Team": {
+      "main": [
+        [
+          {
+            "node": "Check Slack API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11B - Create Follow Up Task": {
+      "main": [
+        [
+          {
+            "node": "12B - Log Successful Execution1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11C - Log Successful Execution2": {
+      "main": [
+        [
+          {
+            "node": "13C - Succeess Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "12A - Log Successful Execution": {
+      "main": [
+        [
+          {
+            "node": "13A - Succeess Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "12B - Log Successful Execution1": {
+      "main": [
+        [
+          {
+            "node": "13B - Succeess Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini AI Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "07 - AI Lead Qualification",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "99 - Log Error1": {
+      "main": [
+        [
+          {
+            "node": "100- Error Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "99 - Log Error2": {
+      "main": [
+        [
+          {
+            "node": "100 - Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b441927c-94af-4614-8345-9d52991828f3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4749ef1dff9dab97533d296fc60571d1f46847c4cabe69d94e1cae900f679a95"
+  },
+  "nodeGroups": [],
+  "id": "jiuLwSZ8DFKI5ldE",
+  "tags": []
+}
