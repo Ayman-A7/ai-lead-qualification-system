@@ -214,19 +214,22 @@ The workflow includes production-inspired reliability features:
 ## Workflow
 
 
-[!Workflow](screenshots/workflow.png)
+![Workflow](screenshots/workflow.png)
 
 ---
+## Bruno POST Request
+
+![Bruno](screenshots/bruno.png)
 
 ## Airtable Leads
 
-[!Airtable](screenshots/airtable_leads.png)
+!![Airtable](screenshots/airtable_leads.png)
 
 ---
 
 ## Slack Notification
 
-[!Slack](screenshots/slack.png)
+![Slack](screenshots/slack.png)
 
 
 
@@ -234,7 +237,7 @@ The workflow includes production-inspired reliability features:
 
 ## Automation Logs
 
-[!AutomationLogs](screensots/airtable_logs.png)
+![AutomationLogs](screenshots/airtable_logs.png)
 
 
 
