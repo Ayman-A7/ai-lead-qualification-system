@@ -4,8 +4,6 @@ Businesses often receive dozens of inbound leads every day.
 
 Manually reviewing every lead is slow, inconsistent, and causes high-value prospects to wait too long.
 
-This workflow automatically validates, qualifies, prioritizes, routes, and logs every inbound lead using AI.
-
 An intelligent lead qualification workflow built with **n8n**, **Google Gemini AI**, **Airtable**, and **Slack**.
 
 The workflow automatically validates incoming leads, eliminates duplicates, scores lead quality using AI, assigns priorities, routes leads to the appropriate team, and logs every execution for monitoring and auditing.
